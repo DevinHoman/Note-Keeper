@@ -31,22 +31,23 @@ public final class NoteInfo implements Parcelable{
         dest.writeString(mText);
     }
 
+    public final static Parcelable.Creator<NoteInfo> CREATOR =
+            new Parcelable.Creator<NoteInfo>(){
+
+                @Override
+                public NoteInfo createFromParcel(Parcel parcel) {
+                    return new NoteInfo(parcel);
+                }
+
+                @Override
+                public NoteInfo[] newArray(int i) {
+                    return new NoteInfo[i];
+                }
+            };
+
     @Override
-    public int describeContents() {
-        return 0;
-    }
+    public int describeContents(){return 0;}
 
-    public static final Creator<NoteInfo> CREATOR = new Creator<NoteInfo>() {
-        @Override
-        public NoteInfo createFromParcel(Parcel source) {
-            return new NoteInfo(source);
-        }
-
-        @Override
-        public NoteInfo[] newArray(int size) {
-            return new NoteInfo[size];
-        }
-    };
 
     public CourseInfo getCourse() {
         return mCourse;
