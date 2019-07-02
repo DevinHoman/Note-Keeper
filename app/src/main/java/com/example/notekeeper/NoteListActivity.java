@@ -26,8 +26,7 @@ public class NoteListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(new Intent(NoteListActivity.this,MainActivity.class));
             }
         });
 
@@ -36,7 +35,7 @@ public class NoteListActivity extends AppCompatActivity {
 
     private void intializeDisplayContent() {
 
-        ListView listNotes = findViewById(R.id.list_notes);
+        final ListView listNotes = findViewById(R.id.list_notes);
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
 
@@ -47,8 +46,10 @@ public class NoteListActivity extends AppCompatActivity {
         listNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             //Makes a nested class
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent intent = new Intent(NoteListActivity.this,MainActivity.class);
+                NoteInfo note = (NoteInfo)listNotes.getItemAtPosition(position);
+                intent.putExtra(MainActivity.NOTE_INFO ,note);
                 startActivity(intent);
             }
         });
