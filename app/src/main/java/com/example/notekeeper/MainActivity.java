@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mTextNoteTitle;
     private EditText mTextNoteText;
     private int mNotePosition;
-    private Boolean mIsCanceling;
+    private Boolean mIsCanceling = false;
     private String originalNoteCourseID;
     private String originalNoteTitle;
     private String originalNoteText;
