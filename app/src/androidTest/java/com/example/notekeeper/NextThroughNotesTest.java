@@ -1,30 +1,25 @@
 package com.example.notekeeper;
 
-import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
-import static org.junit.Assert.*;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.contrib.DrawerActions;
-import android.support.test.espresso.contrib.NavigationViewActions;
-import android.support.test.espresso.contrib.RecyclerViewActions;
-import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
+import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 
-import org.junit.Rule;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.contrib.DrawerActions;
+import androidx.test.espresso.contrib.NavigationViewActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
 
-import org.junit.Test;
+import androidx.test.runner.AndroidJUnit4;
 
 
-import java.util.List;
+import static androidx.test.espresso.Espresso.onView;
 
-import static android.support.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 
-import static android.support.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 
 public class NextThroughNotesTest {
