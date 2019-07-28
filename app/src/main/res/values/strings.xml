@@ -30,6 +30,7 @@
     <!-- Messages Preferences -->
     <string name="signature_title">Name</string>
     <string name="email_title">Email Address</string>
+    <string name="pref_default_favourite_social">https://plus.google.com</string>
 
 
     <!-- Sync Preferences -->

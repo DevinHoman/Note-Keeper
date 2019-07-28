@@ -10,11 +10,12 @@
     </string-array>
 
     <string-array name="list_social_values">
-        <item>Google+</item>
-        <item>Facebook</item>
-        <item>Instagram</item>
-        <item>Twitter</item>
+        <item>https://plus.google.com</item>
+        <item>https://facebook.com</item>
+        <item>https://instagram.com</item>
+        <item>https://twitter.com</item>
 
     </string-array>
+
 </resources>
 

@@ -21,20 +21,20 @@
 
 
         <EditTextPreference
-            app:key="signature"
+            app:key="key_signature"
             app:title="@string/signature_title"
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
-            app:key="email"
+            app:key="key_email"
             app:title="@string/email_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="Choose a option"
+            app:defaultValue="@strings/pref_default_favourite_social"
             app:entries="@array/list_social_entries"
             app:entryValues="@array/list_social_values"
-            app:key="Social Network"
+            app:key="key_socialnetwork"
             app:title="Favourite Social Network"
             app:useSimpleSummaryProvider ="true"/>
 
