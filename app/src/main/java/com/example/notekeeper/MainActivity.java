@@ -30,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private String originalNoteCourseID;
     private String originalNoteTitle;
     private String originalNoteText;
+    private NoteKeeperOpenHelper dbOpenHelper;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        dbOpenHelper = new NoteKeeperOpenHelper(this);
 
         mSpinnerCourses = findViewById(R.id.spinner_courses);
 
@@ -60,8 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         if(!isNewNote)
-        displayNote(mSpinnerCourses, mTextNoteTitle, mTextNoteText);
+            loadNoteData();
         Log.d(TAG,"onCreate");
+
+    }
+
+    private void loadNoteData() {
 
     }
 
@@ -80,12 +92,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void displayNote(Spinner spinnerCourses, EditText textNoteTitle, EditText textNoteText) {
+    private void displayNote() {
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         int courseIndex = courses.indexOf(mNote.getCourse());
-        spinnerCourses.setSelection(courseIndex);
-        textNoteTitle.setText(mNote.getTitle());
-        textNoteText.setText(mNote.getText());
+        mSpinnerCourses.setSelection(courseIndex);
+        mTextNoteTitle.setText(mNote.getTitle());
+        mTextNoteText.setText(mNote.getText());
 
     }
 
@@ -150,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         mNote = DataManager.getInstance().getNotes().get(mNotePosition);
 
         saveOriginalNoteValues();
-        displayNote(mSpinnerCourses,mTextNoteTitle,mTextNoteText);
+        displayNote();
         invalidateOptionsMenu();
     }
 
