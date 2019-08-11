@@ -1,6 +1,8 @@
 package com.example.notekeeper;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -10,6 +12,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.example.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
 import java.util.List;
 
@@ -31,11 +35,11 @@ public class MainActivity extends AppCompatActivity {
     private String originalNoteTitle;
     private String originalNoteText;
     private NoteKeeperOpenHelper dbOpenHelper;
+    private Cursor noteCursor;
+    private int courseIdPos;
+    private int noteTitlePos;
+    private int noteTextPos;
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadNoteData() {
+        SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
 
+        String courseId = "android intents";
+        String titleStart = "dynamic";
+
+        String selection = NoteInfoEntry.COLUMN_COURSE_ID + " = ? AND "
+                + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ?";
+
+        String[] selectionArgs = {courseId,titleStart + "%"};
+
+        String[] noteColumns = {
+                NoteInfoEntry.COLUMN_COURSE_ID,
+                NoteInfoEntry.COLUMN_NOTE_TITLE,
+                NoteInfoEntry.COLUMN_NOTE_TEXT
+        };
+
+        noteCursor = db.query(NoteInfoEntry.TABLE_NAME,noteColumns,selection,selectionArgs,null,
+                null,null);
+        noteCursor.moveToNext();
+        courseIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
+        noteTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
+        noteTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
+
+        displayNote();
+
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbOpenHelper.close();
+        super.onDestroy();
     }
 
     private void restoreOriginalNoteValue(Bundle savedInstanceState) {
@@ -93,11 +129,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayNote() {
+        String courseID = noteCursor.getString(courseIdPos);
+        String noteTitle = noteCursor.getString(noteTitlePos);
+        String noteText = noteCursor.getString(noteTextPos);
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
-        int courseIndex = courses.indexOf(mNote.getCourse());
+        CourseInfo course = DataManager.getInstance().getCourse(courseID);
+        int courseIndex = courses.indexOf(course);
         mSpinnerCourses.setSelection(courseIndex);
-        mTextNoteTitle.setText(mNote.getTitle());
-        mTextNoteText.setText(mNote.getText());
+        mTextNoteTitle.setText(noteTitle);
+        mTextNoteText.setText(noteText);
+
 
     }
 
