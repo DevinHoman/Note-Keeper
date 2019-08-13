@@ -11,7 +11,14 @@ public final class NoteInfo implements Parcelable{
     private CourseInfo mCourse;
     private String mTitle;
     private String mText;
+    private int Id;
 
+    public NoteInfo(int ID ,CourseInfo course, String title, String text) {
+        mCourse = course;
+        Id = ID;
+        mTitle = title;
+        mText = text;
+    }
     public NoteInfo(CourseInfo course, String title, String text) {
         mCourse = course;
         mTitle = title;

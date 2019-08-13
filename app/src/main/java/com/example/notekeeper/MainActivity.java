@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String ORIGINAL_NOTE_TITLE = "com.example.notekeeper.ORIGINAL_NOTE_TITLE";
     public static final String ORIGINAL_NOTE_TEXT = "com.example.notekeeper.ORIGINAL_NOTE_TEXT";
     public static final int POSITION_NOT_SET = -1;
-    private NoteInfo mNote;
+    private NoteInfo mNote = new NoteInfo(DataManager.getInstance().getCourses().get(0),"","");
     private Boolean isNewNote;
     private Spinner mSpinnerCourses;
     private EditText mTextNoteTitle;
@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         dbOpenHelper = new NoteKeeperOpenHelper(this);
+
+
 
         mSpinnerCourses = findViewById(R.id.spinner_courses);
 
@@ -84,9 +86,11 @@ public class MainActivity extends AppCompatActivity {
         String titleStart = "dynamic";
 
         String selection = NoteInfoEntry.COLUMN_COURSE_ID + " = ? AND "
-                + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ?";
+               + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ?";
+        //String selection = NoteInfoEntry._ID + " = ? AND ";
 
-        String[] selectionArgs = {courseId,titleStart + "%"};
+        //String[] selectionArgs = {Integer.toString(mNotePosition)};
+        String[] selectionArgs = {courseId, titleStart + "%"};
 
         String[] noteColumns = {
                 NoteInfoEntry.COLUMN_COURSE_ID,
@@ -96,11 +100,11 @@ public class MainActivity extends AppCompatActivity {
 
         noteCursor = db.query(NoteInfoEntry.TABLE_NAME,noteColumns,selection,selectionArgs,null,
                 null,null);
-        noteCursor.moveToNext();
+
         courseIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
         noteTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
         noteTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
-
+        noteCursor.moveToNext();
         displayNote();
 
 

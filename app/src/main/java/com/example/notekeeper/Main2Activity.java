@@ -33,7 +33,7 @@ public class Main2Activity extends AppCompatActivity
     private CourseRecyclerAdapter courseRecyclerAdapter;
     private GridLayoutManager coursesLayoutManager;
     private NoteKeeperOpenHelper mDbOpenHelper;
-
+    private SQLiteDatabase db;
 
 
     @Override
@@ -42,6 +42,10 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mDbOpenHelper = new NoteKeeperOpenHelper(this);
+        db = mDbOpenHelper.getWritableDatabase();
+
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,8 +54,9 @@ public class Main2Activity extends AppCompatActivity
             }
         });
 
-        mDbOpenHelper = new NoteKeeperOpenHelper(this);
 
+
+        initializeDisplayContent();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -60,7 +65,7 @@ public class Main2Activity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
-        initializeDisplayContent();
+
     }
 
     @Override
@@ -111,10 +116,10 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void displayNotes() {
-        recyclerItems.setAdapter(noteRecyclerAdapter);
         recyclerItems.setLayoutManager(notesLinearManager);
+        recyclerItems.setAdapter(noteRecyclerAdapter);
 
-
+        db = mDbOpenHelper.getReadableDatabase();
         selectNavigationMenuItem(R.id.nav_notes);
 
     }
@@ -127,9 +132,9 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void displayCourses(){
-        recyclerItems.setAdapter(courseRecyclerAdapter);
-        recyclerItems.setLayoutManager(coursesLayoutManager);
 
+        recyclerItems.setLayoutManager(coursesLayoutManager);
+        recyclerItems.setAdapter(courseRecyclerAdapter);
         selectNavigationMenuItem(R.id.nav_courses);
 
     }
