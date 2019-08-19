@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.notekeeper.MainActivity">
+    tools:context="com.example.notekeeper.NoteActivity">
     <item
         android:id="@+id/action_send_mail"
         android:orderInCategory="100"
@@ -11,6 +11,7 @@
         android:id="@+id/action_next"
         android:icon="@android:drawable/ic_media_next"
         android:title="Next"
+        android:visible="false"
         app:showAsAction="ifRoom|withText" />
     <item
         android:id="@+id/action_cancel"

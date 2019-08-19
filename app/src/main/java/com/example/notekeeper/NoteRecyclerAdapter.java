@@ -16,6 +16,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
     private final Context Context;
     private final List<NoteInfo> notes;
     private final LayoutInflater layoutInflater;
+    private NoteInfo mNote = new NoteInfo(DataManager.getInstance().getCourses().get(0),"","");
 
     public NoteRecyclerAdapter(Context Context, List<NoteInfo> notes) {
         this.Context = Context;
@@ -35,7 +36,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         NoteInfo note = notes.get(position);
         viewHolder.textCourse.setText(note.getCourse().getTitle());
         viewHolder.textTitle.setText(note.getTitle());
-        viewHolder.currentPosition = position;
+        viewHolder.id = note.getId();
     }
 
     @Override
@@ -48,7 +49,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
         public final TextView textCourse;
         public final TextView textTitle;
-        public int currentPosition;
+        public int id;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -58,8 +59,8 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(Context,MainActivity.class);
-                    intent.putExtra(MainActivity.NOTE_POSITION,currentPosition);
+                    Intent intent = new Intent(Context, NoteActivity.class);
+                    intent.putExtra(NoteActivity.NOTE_ID, id);
                     Context.startActivity(intent);
                 }
             });

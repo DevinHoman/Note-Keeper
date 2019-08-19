@@ -34,6 +34,7 @@ public class DatabaseDataWorker {
     }
 
     private void insertCourse(String courseId, String title) {
+
         ContentValues values = new ContentValues();
         values.put(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID, courseId);
         values.put(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE, title);

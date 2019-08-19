@@ -13,9 +13,9 @@ public final class NoteInfo implements Parcelable{
     private String mText;
     private int Id;
 
-    public NoteInfo(int ID ,CourseInfo course, String title, String text) {
+    public NoteInfo(int id ,CourseInfo course, String title, String text) {
         mCourse = course;
-        Id = ID;
+        Id = id;
         mTitle = title;
         mText = text;
     }
@@ -104,4 +104,11 @@ public final class NoteInfo implements Parcelable{
         return getCompareKey();
     }
 
+    public int getId() {
+        return Id;
+    }
+
+    public void setId(int id) {
+        Id = id;
+    }
 }

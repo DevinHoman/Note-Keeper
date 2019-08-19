@@ -43,14 +43,14 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mDbOpenHelper = new NoteKeeperOpenHelper(this);
-        db = mDbOpenHelper.getWritableDatabase();
+        //db = mDbOpenHelper.getWritableDatabase();
 
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(Main2Activity.this,MainActivity.class));
+                startActivity(new Intent(Main2Activity.this, NoteActivity.class));
             }
         });
 
@@ -119,7 +119,7 @@ public class Main2Activity extends AppCompatActivity
         recyclerItems.setLayoutManager(notesLinearManager);
         recyclerItems.setAdapter(noteRecyclerAdapter);
 
-        db = mDbOpenHelper.getReadableDatabase();
+
         selectNavigationMenuItem(R.id.nav_notes);
 
     }
