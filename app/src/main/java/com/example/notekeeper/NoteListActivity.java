@@ -49,7 +49,7 @@ public class NoteListActivity extends AppCompatActivity {
         recyclerNotes.setLayoutManager(notesLinearManager);
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
-        noteRecyclerAdapter = new NoteRecyclerAdapter(this,notes);
+        noteRecyclerAdapter = new NoteRecyclerAdapter(this,null);
         recyclerNotes.setAdapter(noteRecyclerAdapter);
 
     }
