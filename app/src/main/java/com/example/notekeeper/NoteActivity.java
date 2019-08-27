@@ -57,6 +57,12 @@ public class NoteActivity extends AppCompatActivity
     private boolean courseQueryFinished;
     private boolean noteQueryFinished;
 
+    @Override
+    protected void onDestroy() {
+        dbOpenHelper.close();
+        super.onDestroy();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,11 +148,7 @@ public class NoteActivity extends AppCompatActivity
 
     }
 
-    @Override
-    protected void onDestroy() {
-        dbOpenHelper.close();
-        super.onDestroy();
-    }
+
 
     private void restoreOriginalNoteValue(Bundle savedInstanceState) {
        originalNoteCourseID = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_ID);
@@ -168,17 +170,11 @@ public class NoteActivity extends AppCompatActivity
             String courseID = noteCursor.getString(courseIdPos);
             String noteTitle = noteCursor.getString(noteTitlePos);
             String noteText = noteCursor.getString(noteTextPos);
-
-
-
-
             int courseIndex = getIndexCourseId(courseID);
             mSpinnerCourses.setSelection(courseIndex);
             mTextNoteTitle.setText(noteTitle);
             mTextNoteText.setText(noteText);
-            //mNote = new NoteInfo(DataManager.getInstance().getCourses().get(0),"","");
 
-            noteCursor.close();
 
 
 
@@ -433,7 +429,7 @@ public class NoteActivity extends AppCompatActivity
         courseIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
         noteTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
         noteTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
-        noteCursor.moveToNext();
+        noteCursor.moveToFirst();
         noteQueryFinished = true;
         displayNoteWhenQueryIsFinished();
     }
@@ -447,7 +443,8 @@ public class NoteActivity extends AppCompatActivity
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         if(loader.getId() == LOADER_NOTES){
             if(noteCursor != null)
-                noteCursor.close();
+                Log.d("CursorLoader","Cursor is being closed");
+                //noteCursor.close();
         }else if(loader.getId()== COURSE_LOADER){
             adapterCourses.changeCursor(null);
         }

@@ -16,7 +16,9 @@
             android:name=".NotekeeperProvider"
             android:authorities="com.example.notekeeper.provider"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true">
+
+        </provider>
 
         <activity
             android:name=".SettingsActivity"

@@ -45,12 +45,7 @@ public class NoteKeeperOpenHelper extends SQLiteOpenHelper {
         worker.insertSampleNotes();
     }
 
-    /*private void insertDummyData() {
 
-        DatabaseDataWorker worker = new DatabaseDataWorker(db);
-        worker.insertCourses();
-        worker.insertSampleNotes();
-    }*/
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
