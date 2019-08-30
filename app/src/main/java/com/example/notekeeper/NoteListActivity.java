@@ -37,15 +37,15 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // adapterNote.notifyDataSetChanged();
+
         noteRecyclerAdapter.notifyDataSetChanged();
     }
 
     private void initializeDisplayContent() {
 
 
-        RecyclerView recyclerNotes = findViewById(R.id.list_notes);
-        LinearLayoutManager notesLinearManager = new LinearLayoutManager(this);
+        final RecyclerView recyclerNotes = findViewById(R.id.list_notes);
+        final LinearLayoutManager notesLinearManager = new LinearLayoutManager(this);
         recyclerNotes.setLayoutManager(notesLinearManager);
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();

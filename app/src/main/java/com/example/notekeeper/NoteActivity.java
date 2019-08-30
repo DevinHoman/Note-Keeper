@@ -85,7 +85,7 @@ public class NoteActivity extends AppCompatActivity
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerCourses.setAdapter(adapterCourses);
 
-        getSupportLoaderManager().initLoader(COURSE_LOADER,null,this);
+        LoaderManager.getInstance(this).initLoader(COURSE_LOADER,null,this);
 
         readDisplayStateValues();
         if(savedInstanceState == null){
@@ -99,7 +99,7 @@ public class NoteActivity extends AppCompatActivity
 
 
         if(!isNewNote)
-            getSupportLoaderManager().initLoader(LOADER_NOTES,null,this);
+            LoaderManager.getInstance(this).initLoader(LOADER_NOTES,null,this);
         Log.d(TAG,"onCreate");
 
     }
@@ -353,7 +353,7 @@ public class NoteActivity extends AppCompatActivity
         CourseInfo course =(CourseInfo) mSpinnerCourses.getSelectedItem();
         String subject = mTextNoteTitle.getText().toString();
         String text = "Check out what I learned in the Pluralsight course \""
-            + course.getTitle() + "\"n" + mTextNoteText.getText().toString();
+            + course.getTitle() + "\"\n" + mTextNoteText.getText().toString();
 
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc2822");
@@ -429,7 +429,9 @@ public class NoteActivity extends AppCompatActivity
         courseIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
         noteTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
         noteTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
+
         noteCursor.moveToFirst();
+
         noteQueryFinished = true;
         displayNoteWhenQueryIsFinished();
     }
@@ -444,7 +446,7 @@ public class NoteActivity extends AppCompatActivity
         if(loader.getId() == LOADER_NOTES){
             if(noteCursor != null)
                 Log.d("CursorLoader","Cursor is being closed");
-                //noteCursor.close();
+                noteCursor.close();
         }else if(loader.getId()== COURSE_LOADER){
             adapterCourses.changeCursor(null);
         }

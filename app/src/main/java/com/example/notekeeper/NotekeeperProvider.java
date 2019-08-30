@@ -68,10 +68,7 @@ public class NotekeeperProvider extends ContentProvider {
         SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
 
         int uriMatch = sUriMatcher.match(uri);
-        if(cursor != null){
-            cursor = null;
-        }else {
-            switch (uriMatch) {
+        switch (uriMatch) {
                 case COURSES:
                     cursor = db.query(CourseInfoEntry.TABLE_NAME, projection, selection, selectionArgs,
                             null, null, sortOrder);
@@ -83,10 +80,9 @@ public class NotekeeperProvider extends ContentProvider {
 
                 case NOTES_EXPANDED:
                     cursor = notesExpandedQuery(db, projection, selection, selectionArgs, sortOrder);
+                    break;
             }
-        }
-
-        return cursor;
+            return cursor;
     }
 
     private Cursor notesExpandedQuery(SQLiteDatabase db, String[] projection,

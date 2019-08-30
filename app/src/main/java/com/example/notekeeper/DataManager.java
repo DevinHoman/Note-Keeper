@@ -44,7 +44,7 @@ public class DataManager {
                 NoteInfoEntry.COLUMN_NOTE_TEXT,
                 NoteInfoEntry.COLUMN_COURSE_ID,
                 NoteInfoEntry._ID};
-        String noteOrderBy = NoteInfoEntry.COLUMN_COURSE_ID + " ," + NoteInfoEntry.COLUMN_NOTE_TITLE;
+        String noteOrderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
         final Cursor noteCursor = db.query(NoteInfoEntry.TABLE_NAME, noteColumns, null, null,
                 null, null, noteOrderBy);
         loadNotesFromDatabase(noteCursor);

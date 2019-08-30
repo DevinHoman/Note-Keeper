@@ -94,8 +94,8 @@ public final class CourseInfo implements Parcelable {
         dest.writeTypedList(mModules);
     }
 
-    public static final Creator<CourseInfo> CREATOR =
-            new Creator<CourseInfo>() {
+    public static final Parcelable.Creator<CourseInfo> CREATOR =
+            new Parcelable.Creator<CourseInfo>() {
 
                 @Override
                 public CourseInfo createFromParcel(Parcel source) {

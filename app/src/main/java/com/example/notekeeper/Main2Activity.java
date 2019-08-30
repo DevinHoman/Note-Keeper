@@ -35,6 +35,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -48,7 +49,8 @@ public class Main2Activity extends AppCompatActivity
     private CourseRecyclerAdapter courseRecyclerAdapter;
     private GridLayoutManager coursesLayoutManager;
     private NoteKeeperOpenHelper mDbOpenHelper;
-    private SQLiteDatabase db;
+
+
 
 
 
@@ -73,16 +75,18 @@ public class Main2Activity extends AppCompatActivity
 
 
 
-        initializeDisplayContent();
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
+        initializeDisplayContent();
     }
 
     @Override
@@ -90,9 +94,8 @@ public class Main2Activity extends AppCompatActivity
         super.onResume();
 
         // Loader mangager not working, TODO change to Room and Live Data after finished with course
-        getSupportLoaderManager().restartLoader(LOADER_NOTES,null,this);
-
-        //loadNotes();
+        //getSupportLoaderManager().restartLoader(LOADER_NOTES,null,this);
+        LoaderManager.getInstance(Main2Activity.this).restartLoader(LOADER_NOTES,null,Main2Activity.this);
 
 
         updateNavHeader();
@@ -148,6 +151,7 @@ public class Main2Activity extends AppCompatActivity
 
 
         noteRecyclerAdapter = new NoteRecyclerAdapter(this,null);
+
 
         List<CourseInfo> course = DataManager.getInstance().getCourses();
         courseRecyclerAdapter = new CourseRecyclerAdapter(this,course);
@@ -250,7 +254,7 @@ public class Main2Activity extends AppCompatActivity
 
     @NonNull
     @Override
-    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id,@Nullable Bundle args) {
         CursorLoader loader = null;
         if(id == LOADER_NOTES) {
 
@@ -270,14 +274,14 @@ public class Main2Activity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader loader, Cursor data) {
+    public void onLoadFinished(@Nullable Loader loader, Cursor data) {
         if(loader.getId() == LOADER_NOTES) {
             noteRecyclerAdapter.changeCursor(data);
         }
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader loader) {
+    public void onLoaderReset(Loader loader) {
         if(loader.getId() == LOADER_NOTES) {
             noteRecyclerAdapter.changeCursor(null);
         }

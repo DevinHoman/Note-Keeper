@@ -108,7 +108,7 @@ public final class NoteInfo implements Parcelable{
         return Id;
     }
 
-    public void setId(int id) {
+    /*public void setId(int id) {
         Id = id;
-    }
+    }*/
 }
