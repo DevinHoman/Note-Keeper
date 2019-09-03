@@ -8,6 +8,10 @@
         android:title="Send as Email"
         app:showAsAction="never" />
     <item
+        android:id = "@+id/action_setreminder"
+        android:title="@string/set_reminder"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/action_next"
         android:icon="@android:drawable/ic_media_next"
         android:title="Next"
