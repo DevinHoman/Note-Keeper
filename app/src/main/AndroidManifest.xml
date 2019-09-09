@@ -40,7 +40,23 @@
             android:name=".NotekeeperProvider"
             android:authorities="com.example.notekeeper.provider"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+
+        <receiver
+            android:name=".NoteReminderReciever"
+            android:enabled="true"
+            android:exported="true">
+
+        </receiver>
+
+        <service
+            android:name=".NoteUploaderJobService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
+        <service
+            android:name=".NoteBackupService"
+            android:exported="true" />
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />

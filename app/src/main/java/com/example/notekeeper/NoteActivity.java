@@ -1,5 +1,8 @@
 package com.example.notekeeper;
 
+import android.app.AlarmManager;
+import android.app.Application;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -9,12 +12,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -180,7 +187,7 @@ public class NoteActivity extends AppCompatActivity
             mTextNoteText.setText(noteText);
 
 
-
+            CourseEventBroadcastHelper.sendEventBroadcast(this,courseID,"Editing Note");
 
     }
 
@@ -217,15 +224,59 @@ public class NoteActivity extends AppCompatActivity
     }
 
     private void createNewNote() {
+        AsyncTask<ContentValues, Integer , Uri> task = new AsyncTask<ContentValues, Integer, Uri>() {
+            private ProgressBar progressBar;
+
+            @Override
+            protected void onPreExecute() {
+                progressBar = findViewById(R.id.progress_bar);
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setProgress(1);
+            }
+
+            @Override
+            protected Uri doInBackground(ContentValues... contentValues) {
+                Log.d(TAG,"doInBackground - thread :"+ Thread.currentThread().getId());
+                ContentValues insertValues = contentValues[0];
+                Uri rowUri = getContentResolver().insert(Notes.CONTENT_URI,insertValues);
+                simulateLongRunningWork();
+                publishProgress(2);
+
+                simulateLongRunningWork();
+                publishProgress(3);
+                return rowUri;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                int progressValue = values[0];
+                progressBar.setProgress(progressValue);
+            }
+
+            @Override
+            protected void onPostExecute(Uri uri) {
+                Log.d(TAG,"PostExecute - thread :"+ Thread.currentThread().getId());
+                progressBar.setVisibility(View.GONE);
+                mNoteUri = uri;
+
+            }
+        };
+
         ContentValues values = new ContentValues();
         values.put(Notes.COLUMN_COURSE_ID, "");
         values.put(Notes.COLUMN_NOTE_TITLE, "");
         values.put(Notes.COLUMN_NOTE_TEXT, "");
+        Log.d(TAG,"Call to execute - thread :"+ Thread.currentThread().getId());
+        task.execute(values);
 
-        mNoteUri = getContentResolver().insert(Notes.CONTENT_URI,values);
 
 
+    }
 
+    private void simulateLongRunningWork() {
+        try {
+            Thread.sleep(2000);
+        } catch(Exception ex) {}
     }
 
     @Override
@@ -253,6 +304,9 @@ public class NoteActivity extends AppCompatActivity
             moveNext();
         }else if(id == R.id.action_setreminder){
             showReminderNotification();
+        }else if(id == R.id.item_delete_note){
+            deleteNoteFromDatabase();
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -262,7 +316,22 @@ public class NoteActivity extends AppCompatActivity
         String noteTitle = mTextNoteTitle.getText().toString();
         String noteText = mTextNoteText.getText().toString();
         int noteId = (int)ContentUris.parseId(mNoteUri);
-        NoteReminderNotification.notify(this,noteText,noteTitle,noteId);
+
+        Intent intent = new Intent(this,NoteReminderReciever.class);
+        intent.putExtra(NoteReminderReciever.EXTRA_NOTE_TITLE,noteTitle);
+        intent.putExtra(NoteReminderReciever.EXTRA_NOTE_TEXT,noteText);
+        intent.putExtra(NoteReminderReciever.EXTRA_NOTE_ID,noteId);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        long currentTimeInMiliSecondes = SystemClock.elapsedRealtime();
+        long ONE_HOUR = 60*60*1000;
+        long TEN_SECONDS = 10*1000;
+
+        long alarmTime = currentTimeInMiliSecondes + TEN_SECONDS;
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME,alarmTime,pendingIntent);
+
     }
 
     @Override
@@ -307,7 +376,7 @@ public class NoteActivity extends AppCompatActivity
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
-                getContentResolver().delete(mNoteUri,null,null);
+                getContentResolver().delete(mNoteUri,selection,selectionArgs);
                 return null;
             }
         };

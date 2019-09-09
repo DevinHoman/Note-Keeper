@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_upload_notes"
+        android:title="@string/action_upload_notes" />
+    <item
+        android:id="@+id/item_backup_notes"
+        android:title="@string/menu_backup_notes" />
 </menu>

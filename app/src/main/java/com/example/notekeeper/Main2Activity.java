@@ -1,6 +1,9 @@
 package com.example.notekeeper;
 
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -24,7 +27,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.PersistableBundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.view.Gravity;
 import android.view.View;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -43,6 +51,7 @@ import java.util.List;
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener , LoaderManager.LoaderCallbacks<Cursor> {
     public static final int LOADER_NOTES = 0;
+    public static final int NOTE_UPLOADER_ID = 1;
     private NoteRecyclerAdapter noteRecyclerAdapter;
     private RecyclerView recyclerItems;
     private LinearLayoutManager notesLinearManager;
@@ -60,11 +69,12 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        enableStrictMode();
+
+
+
         mDbOpenHelper = new NoteKeeperOpenHelper(this);
-
-
-
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +99,18 @@ public class Main2Activity extends AppCompatActivity
         initializeDisplayContent();
     }
 
+    private void enableStrictMode() {
+        if(BuildConfig.DEBUG){
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build();
+            StrictMode.setThreadPolicy(policy);
+
+
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -96,9 +118,23 @@ public class Main2Activity extends AppCompatActivity
         // Loader mangager not working, TODO change to Room and Live Data after finished with course
         //getSupportLoaderManager().restartLoader(LOADER_NOTES,null,this);
         LoaderManager.getInstance(Main2Activity.this).restartLoader(LOADER_NOTES,null,Main2Activity.this);
-
-
         updateNavHeader();
+
+        openDrawer();
+
+
+    }
+
+    private void openDrawer() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                drawer.openDrawer(Gravity.LEFT,true);
+            }
+        },1000);
+
     }
 
     private void loadNotes() {
@@ -210,11 +246,39 @@ public class Main2Activity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this,SettingsActivity.class));
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
-        }
+        }else if(id == R.id.item_backup_notes){
+            backupNotes();
 
+        }else if(id == R.id.action_upload_notes){
+            scheduleNoteUpload();
+
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+    private void scheduleNoteUpload() {
+        PersistableBundle extras = new PersistableBundle();
+        extras.putString(NoteUploaderJobService.EXTRA_DATA_URI,Notes.CONTENT_URI.toString());
+
+        ComponentName componentName = new ComponentName(this,NoteUploaderJobService.class);
+        JobInfo jobInfo = new JobInfo.Builder(NOTE_UPLOADER_ID,componentName)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setExtras(extras)
+                .build();
+        JobScheduler jobScheduler =(JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(jobInfo);
+
+
+    }
+
+    private void backupNotes() {
+        Intent intent = new Intent(this,NoteBackupService.class);
+        intent.putExtra(NoteBackupService.EXTRA_COURSE_ID,NoteBackup.ALL_COURSES);
+        startService(intent);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

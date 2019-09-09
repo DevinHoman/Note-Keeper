@@ -56,6 +56,8 @@ public class NoteReminderNotification {
         Intent noteActivityIntent = new Intent(context,NoteActivity.class);
         noteActivityIntent.putExtra(NoteActivity.NOTE_ID,noteId);
 
+        Intent backupServiceIntent = new Intent(context,NoteBackupService.class);
+        backupServiceIntent.putExtra(NoteBackupService.EXTRA_COURSE_ID,NoteBackup.ALL_COURSES);
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
 
@@ -116,6 +118,14 @@ public class NoteReminderNotification {
                                 new Intent(context,Main2Activity.class),
                                 PendingIntent.FLAG_UPDATE_CURRENT
                         ))
+                .addAction(0,"Backup Notes",
+                    PendingIntent.getService(
+                        context,
+                        0,
+                        backupServiceIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                ))
+
 
 
 
@@ -146,9 +156,10 @@ public class NoteReminderNotification {
         }
     }
 
+
     /**
      * Cancels any notifications of this type previously shown using
-     * {@link #notify(Context, String, int)}.
+     * {@link #notify(Context, String , String , int)}.
      */
     @TargetApi(Build.VERSION_CODES.ECLAIR)
     public static void cancel(final Context context) {

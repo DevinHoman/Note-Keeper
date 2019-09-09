@@ -22,4 +22,7 @@
         android:icon="@android:drawable/ic_menu_revert"
         android:title="Cancel"
         app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/item_delete_note"
+        android:title="@string/menu_delete_note" />
 </menu>

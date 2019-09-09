@@ -44,6 +44,9 @@
         viverra rhoncus sit amet nec magna. Donec lacinia ligula at libero volutpat volutpat nec nec
         tortor.
     </string>
+    <string name="menu_backup_notes">Backup notes</string>
+    <string name="action_upload_notes">Upload Notes</string>
+    <string name="menu_delete_note">Delete Note</string>
 
 
     <!-- Sync Preferences -->
