@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Note Keeper</string>
+    <string name="hint_note_text">Maak n nota</string>
+    <string name="hint_note_title">Nota Title</string>
+    <string name="title_activity_note">Maak Veranderinge\n</string>
+</resources>

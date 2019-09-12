@@ -47,6 +47,7 @@ public class NoteActivity extends AppCompatActivity
     public static final String ORIGINAL_NOTE_COURSE_ID = "com.example.notekeeper.ORIGINAL_NOTE_COURSE_ID";
     public static final String ORIGINAL_NOTE_TITLE = "com.example.notekeeper.ORIGINAL_NOTE_TITLE";
     public static final String ORIGINAL_NOTE_TEXT = "com.example.notekeeper.ORIGINAL_NOTE_TEXT";
+    public static final String ORIGINAL_NOTE_URI = "com.example.notekeeper.NOTE_URI";
     public static final int ID_NOT_SET = -1;
     private NoteInfo mNote = new NoteInfo(DataManager.getInstance().getCourses().get(0),"","");
     private Boolean isNewNote;
@@ -103,6 +104,8 @@ public class NoteActivity extends AppCompatActivity
             saveOriginalNoteValues();
         }else{
             restoreOriginalNoteValue(savedInstanceState);
+            String stringUri = savedInstanceState.getString(ORIGINAL_NOTE_URI);
+            mNoteUri = Uri.parse(stringUri);
         }
 
         mTextNoteTitle = findViewById(R.id.text_note_title);
@@ -399,6 +402,8 @@ public class NoteActivity extends AppCompatActivity
         outState.putString(ORIGINAL_NOTE_COURSE_ID,originalNoteCourseID);
         outState.putString(ORIGINAL_NOTE_TITLE,originalNoteTitle);
         outState.putString(ORIGINAL_NOTE_TEXT,originalNoteText);
+
+        outState.putString(ORIGINAL_NOTE_URI,mNoteUri.toString());
     }
 
     private void saveNote() {

@@ -18,7 +18,6 @@
     <string name="nav_note_title">Notes</string>
     <string name="nav_courses">Courses</string>
     <string name="hint_note_title">Note Title</string>
-    <string name="hint_note_text">Note Text</string>
     <string name="nav_share_message">share</string>
     <string name="nav_send_message">Send</string>
     <string name="title_activity_settings">Settings</string>
@@ -47,6 +46,7 @@
     <string name="menu_backup_notes">Backup notes</string>
     <string name="action_upload_notes">Upload Notes</string>
     <string name="menu_delete_note">Delete Note</string>
+    <string name="hint_note_text">Note Text</string>
 
 
     <!-- Sync Preferences -->
