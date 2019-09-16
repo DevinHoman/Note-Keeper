@@ -7,8 +7,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -16,6 +16,8 @@ import android.view.View;
  */
 public class ModuleStatusView extends View {
     public static final int EDIT_MODE_MODULE_COUNT = 7;
+    public static final int INVALID_INDEX = -1;
+    public static final int SHAPE_CIRCLE = 0;
     private String mExampleString; // TODO: use a default from R.string...
     private int mExampleColor = Color.RED; // TODO: use a default from R.color...
     private float mExampleDimension = 0; // TODO: use a default from R.dimen...
@@ -29,6 +31,8 @@ public class ModuleStatusView extends View {
     private Paint paintfill;
     private Rect[] moduleRectancle;
     private float radius;
+    private int mMaxHorizontalModules;
+    private int shape;
 
 
     public boolean[] getmModuleStatus() {
@@ -57,29 +61,15 @@ public class ModuleStatusView extends View {
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
-        if(isInEditMode()){
+        if(isInEditMode())
             setUpEditModeValues();
-        }
+
 
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.ModuleStatusView, defStyle, 0);
 
-       /* mExampleString = a.getString(
-                R.styleable.ModuleStatusView_exampleString);
-        mExampleColor = a.getColor(
-                R.styleable.ModuleStatusView_exampleColor,
-                mExampleColor);
-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-        // values that should fall on pixel boundaries.
-        mExampleDimension = a.getDimension(
-                R.styleable.ModuleStatusView_exampleDimension,
-                mExampleDimension);
-
-        if (a.hasValue(R.styleable.ModuleStatusView_exampleDrawable)) {
-            mExampleDrawable = a.getDrawable(
-                    R.styleable.ModuleStatusView_exampleDrawable);
-            mExampleDrawable.setCallback(this);
-        }*/
+        outlineColor = a.getColor(R.styleable.ModuleStatusView_outlineColor,Color.BLACK);
+        shape = a.getInt(R.styleable.ModuleStatusView_shape, SHAPE_CIRCLE);
 
         a.recycle();
 
@@ -87,9 +77,9 @@ public class ModuleStatusView extends View {
         shapeSize = 144f;
         spacing = 30f;
         radius = (shapeSize-outlineWidth)/2;
-        setupModuleRectangles();
 
-        outlineColor = Color.BLACK;
+
+
         paintOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintOutline.setStyle(Paint.Style.STROKE);
         paintOutline.setStrokeWidth(outlineWidth);
@@ -113,11 +103,42 @@ public class ModuleStatusView extends View {
         setmModuleStatus(exampleModuleValues);
     }
 
-    private void setupModuleRectangles() {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int desireWidth = 0;
+        int desireHeight = 0;
+
+        int specWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int availableWidth = specWidth - getPaddingLeft() - getPaddingRight();
+        int horizontalModulesCanFit = (int)(availableWidth/(shapeSize + spacing));
+        mMaxHorizontalModules = Math.min(horizontalModulesCanFit,mModuleStatus.length);
+
+
+        desireWidth = (int) (mMaxHorizontalModules * (shapeSize + spacing) - spacing);
+        desireWidth += getPaddingLeft() + getPaddingRight();
+
+        int rows = ((mModuleStatus.length - 1) / mMaxHorizontalModules) +1;
+
+        desireHeight = (int)((rows*(shapeSize + spacing)) - spacing);
+        desireHeight += getPaddingTop() + getPaddingBottom();
+
+        int width = resolveSizeAndState(desireWidth,widthMeasureSpec,0);
+        int height = resolveSizeAndState(desireHeight,heightMeasureSpec,0);
+
+        setMeasuredDimension(width,height);
+    }
+
+    private void setupModuleRectangles(int width) {
+        int availableWidth = width - getPaddingLeft()-getPaddingRight();
+        int horizontalModulesCanFit = (int)(availableWidth/(shapeSize+spacing));
+        int maxHorizontalModules = Math.min(horizontalModulesCanFit,mModuleStatus.length);
+
         moduleRectancle = new Rect[mModuleStatus.length];
         for(int moduleIndex = 0; moduleIndex< moduleRectancle.length; moduleIndex++){
-            int x = (int) (moduleIndex * (shapeSize+spacing));
-            int y = 0;
+            int column = moduleIndex % maxHorizontalModules;
+            int row = moduleIndex/maxHorizontalModules;
+            int x = getPaddingLeft() + (int)(column * (shapeSize + spacing));
+            int y = getPaddingTop() + (int)(row * (shapeSize + spacing));
             moduleRectancle[moduleIndex] = new Rect(x,y,x + (int)shapeSize,y + (int)shapeSize);
 
 
@@ -126,6 +147,12 @@ public class ModuleStatusView extends View {
 
 
 
+
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        setupModuleRectangles(w);
     }
 
     private void invalidateTextPaintAndMeasurements() {
@@ -183,6 +210,41 @@ public class ModuleStatusView extends View {
 
 
 
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                return true;
+            case MotionEvent.ACTION_UP:
+                int moduleIndex = findItemAtPoint(event.getX(),event.getY());
+                onModuleSelected(moduleIndex);
+                return true;
+
+        }
+
+
+        return super.onTouchEvent(event);
+    }
+
+    private void onModuleSelected(int moduleIndex) {
+        if(moduleIndex == INVALID_INDEX)
+            return;
+
+        mModuleStatus[moduleIndex] =! mModuleStatus[moduleIndex];
+        invalidate();
+    }
+
+    private int findItemAtPoint(float x, float y) {
+        int moduleIndex = INVALID_INDEX;
+        for(int i=0;i<moduleRectancle.length;i++){
+            if(moduleRectancle[i].contains((int) x,(int)y)){
+                moduleIndex = i;
+                break;
+            }
+        }
+        return moduleIndex;
     }
 
     /**
