@@ -9,7 +9,6 @@
         android:background="#ccc"
         android:paddingLeft="10dp"
         android:paddingTop="10dp"
-        android:paddingBottom="40dp"
-        />
+        android:paddingBottom="40dp" />
 
 </FrameLayout>

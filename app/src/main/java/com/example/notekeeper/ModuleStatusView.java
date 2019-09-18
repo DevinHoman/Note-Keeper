@@ -7,9 +7,21 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.customview.widget.ExploreByTouchHelper;
+
+import java.util.List;
 
 /**
  * TODO: document your custom view class.
@@ -18,6 +30,7 @@ public class ModuleStatusView extends View {
     public static final int EDIT_MODE_MODULE_COUNT = 7;
     public static final int INVALID_INDEX = -1;
     public static final int SHAPE_CIRCLE = 0;
+    public static final float DEFAULT_OUTLINE_WIDTH_DP = 2f;
     private String mExampleString; // TODO: use a default from R.string...
     private int mExampleColor = Color.RED; // TODO: use a default from R.color...
     private float mExampleDimension = 0; // TODO: use a default from R.dimen...
@@ -33,6 +46,7 @@ public class ModuleStatusView extends View {
     private float radius;
     private int mMaxHorizontalModules;
     private int shape;
+    private ModuleStatusAccessHelper accessHelper;
 
 
     public boolean[] getmModuleStatus() {
@@ -64,16 +78,25 @@ public class ModuleStatusView extends View {
         if(isInEditMode())
             setUpEditModeValues();
 
+        setFocusable(true);
+        accessHelper = new ModuleStatusAccessHelper(this);
+        ViewCompat.setAccessibilityDelegate(this,accessHelper);
+
+        DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+        float displayDensity = dm.density;
+        float defaultOutlineWidthPixels = displayDensity * DEFAULT_OUTLINE_WIDTH_DP;
+
 
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.ModuleStatusView, defStyle, 0);
 
         outlineColor = a.getColor(R.styleable.ModuleStatusView_outlineColor,Color.BLACK);
         shape = a.getInt(R.styleable.ModuleStatusView_shape, SHAPE_CIRCLE);
+        outlineWidth = a.getDimension(R.styleable.ModuleStatusView_outlineWidth,defaultOutlineWidthPixels);
 
         a.recycle();
 
-        outlineWidth = 6f;
+
         shapeSize = 144f;
         spacing = 30f;
         radius = (shapeSize-outlineWidth)/2;
@@ -92,6 +115,22 @@ public class ModuleStatusView extends View {
 
         // Update TextPaint and text measurements from attributes
        // invalidateTextPaintAndMeasurements();
+    }
+
+    @Override
+    protected void onFocusChanged(boolean gainFocus, int direction, @Nullable Rect previouslyFocusedRect) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        accessHelper.onFocusChanged(gainFocus,direction,previouslyFocusedRect);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        return accessHelper.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    protected boolean dispatchHoverEvent(MotionEvent event) {
+        return accessHelper.dispatchHoverEvent(event) || super.dispatchHoverEvent(event);
     }
 
     private void setUpEditModeValues() {
@@ -195,20 +234,34 @@ public class ModuleStatusView extends View {
 
          */
 
-        for(int moduleIndex = 0; moduleIndex < moduleRectancle.length;moduleIndex++){
-            float x = moduleRectancle[moduleIndex].centerX();
-            float y = moduleRectancle[moduleIndex].centerY();
+        for (int moduleIndex = 0; moduleIndex < moduleRectancle.length; moduleIndex++) {
+            if(shape == SHAPE_CIRCLE) {
+                float x = moduleRectancle[moduleIndex].centerX();
+                float y = moduleRectancle[moduleIndex].centerY();
 
-            if(mModuleStatus[moduleIndex])
-                canvas.drawCircle(x, y, radius, paintfill);
+                if (mModuleStatus[moduleIndex])
+                    canvas.drawCircle(x, y, radius, paintfill);
 
                 canvas.drawCircle(x, y, radius, paintOutline);
-
+            }else{
+                drawSquare(canvas,moduleIndex);
+            }
 
 
         }
 
+    }
 
+    private void drawSquare(Canvas canvas , int moduleIndex){
+        Rect moduleRectangle = moduleRectancle[moduleIndex];
+
+        if(mModuleStatus[moduleIndex])
+            canvas.drawRect(moduleRectangle,paintfill);
+
+        canvas.drawRect(moduleRectangle.left + (outlineWidth/2),
+                moduleRectangle.top + (outlineWidth/2),
+                moduleRectangle.right + (outlineWidth/2),
+                moduleRectangle.bottom +(outlineWidth/2),paintOutline);
 
     }
 
@@ -234,6 +287,9 @@ public class ModuleStatusView extends View {
 
         mModuleStatus[moduleIndex] =! mModuleStatus[moduleIndex];
         invalidate();
+        accessHelper.invalidateVirtualView(moduleIndex);
+        accessHelper.sendEventForVirtualView(moduleIndex, AccessibilityEvent.TYPE_VIEW_CLICKED);
+
     }
 
     private int findItemAtPoint(float x, float y) {
@@ -324,5 +380,60 @@ public class ModuleStatusView extends View {
      */
     public void setExampleDrawable(Drawable exampleDrawable) {
         mExampleDrawable = exampleDrawable;
+    }
+
+
+    private class ModuleStatusAccessHelper extends ExploreByTouchHelper{
+
+        /**
+         * Constructs a new helper that can expose a virtual view hierarchy for the
+         * specified host view.
+         *
+         * @param host view whose virtual view hierarchy is exposed by this helper
+         */
+        public ModuleStatusAccessHelper(@NonNull View host) {
+            super(host);
+        }
+
+        @Override
+        protected int getVirtualViewAt(float x, float y) {
+
+            int moduleIndex =  findItemAtPoint(x,y);
+            return moduleIndex == INVALID_INDEX ? ExploreByTouchHelper.INVALID_ID : moduleIndex;
+        }
+
+        @Override
+        protected void getVisibleVirtualViews(List<Integer> virtualViewIds) {
+            if(moduleRectancle == null)
+                return;
+
+            for(int i = 0 ; i < moduleRectancle.length;i++){
+                virtualViewIds.add(i);
+            }
+        }
+
+        @Override
+        protected void onPopulateNodeForVirtualView(int virtualViewId, @NonNull AccessibilityNodeInfoCompat node) {
+            node.setFocusable(true);
+            node.setBoundsInParent(moduleRectancle[virtualViewId]);
+            node.setContentDescription("module " + virtualViewId);
+
+            node.setCheckable(true);
+            node.setChecked(mModuleStatus[virtualViewId]);
+
+            node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+        }
+
+        @Override
+        protected boolean onPerformActionForVirtualView(int virtualViewId, int action, @Nullable Bundle arguments) {
+            switch (action){
+                case AccessibilityNodeInfoCompat.ACTION_CLICK :
+                    onModuleSelected(virtualViewId);
+                    return true;
+
+            }
+
+            return false;
+        }
     }
 }
